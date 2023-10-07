@@ -1,0 +1,10 @@
+colorama>=0.4.6
+matplotlib>=3.7.2
+moviepy>=1.0.3
+numpy>=1.25.2
+PyMuPDF>=1.22.5
+PyPDF4>=1.27.0
+pyperclip>=1.8.2
+scikit_learn>=1.2.2
+tabulate>=0.9.0
+tqdm>=4.66.1

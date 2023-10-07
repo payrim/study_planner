@@ -1,0 +1,52 @@
+import os 
+
+if os.name == 'nt':
+    notes_file = "C:\\Program Files\\Planner\\"
+    GREEN = '\033[92m'
+    BLUE = '\033[94m'
+    YELLOW = '\033[93m'
+    PURPLE = '\033[95m'
+    CYAN = '\033[96m' 
+    RESET = '\033[0m'
+    WWITE = '\033[97m'
+    RED = '\033[31m'
+    BLACK = '\033[30m'
+    WPURPLE = '\x1b[38;5;93m\x1b[49m'
+    WRED='\x1b[38;2;162;15;15m\x1b[49m'
+    WPURPLE= '\x1b[38;2;200;150;225m\x1b[49m'
+    line= '-'
+    line2= '-'
+    line3 = "-"
+    space=' '
+    folder = "📁"
+    folder2 = '📕'
+    laugh = "😂"
+    cline ="〰️"
+    plus ="➕"
+    space = " "
+else:
+    dirn = "plannerconf"
+    notes_file = os.path.join(os.getcwd(), dirn)
+    dirp = "plannerconf/pomo"
+    pomo_file = os.path.join(os.getcwd(), dirp)
+    GREEN = '\033[92m'
+    BLUE = '\033[94m'
+    YELLOW = '\033[93m'
+    PURPLE = '\033[95m'
+    CYAN = '\033[96m' 
+    RESET = '\033[0m'
+    WWITE = '\033[97m'
+    RED = '\033[31m'
+    BLACK = '\033[30m'
+    WPURPLE = '\x1b[38;5;93m\x1b[49m'
+    WRED='\x1b[38;2;162;15;15m\x1b[49m'
+    WPURPLE= '\x1b[38;2;200;150;225m\x1b[49m'
+    line= '➖'
+    line2= '-'
+    space=' '
+    folder = "📁"
+    folder2 = '📕'
+    laugh = "😂"
+    cline ="〰️"
+    plus ="➕"
+    space = " "

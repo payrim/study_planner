@@ -1,0 +1,28 @@
+# SAT
+07:00 - 08:20 - GYM
+10:15 - 13:00 - numerical analysis
+
+# SUN
+15:45 - 18:30 - Statistical Methods 
+19:00 - 20:20 - GYM
+
+# MON
+07:30 - 09:20 - ONS
+10:15 - 13:00 - computer networks
+13:00 - 15:45 - AI
+15:45 - 18:30 - Algebra
+19:00 - 20:20 - GYM
+
+# TUE
+13:00 - 15:45 - linear algebra
+19:00 - 20:00 - GYM
+
+# WED
+07:00 - 08:20 - GYM
+09:20 - 11:10 - defa
+
+# THUR
+07:00 - 08:20 - GYM
+
+# FRI
+14:00 - 15:30 - GYM
