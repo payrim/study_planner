@@ -37,11 +37,11 @@ def main():
         print(colors.space*7+colors.plus+colors.line*19+" "+colors.line*21+colors.plus)
         print(colors.space*7+"‖{:<39}‖{:<42}‖".format(" k. tasks     - kanban board", " g. goals     - modify goals"))
         print(colors.space*7+"‖{:<39}‖{:<42}‖".format(" p. project   - project automation", " u. subject   - subject selector"))
-        print(colors.space*7+"‖{:<39}‖{:<42}‖".format(" s. schedule  - weekly schedule",      " o. notes     - description note (no) "))
+        print(colors.space*7+"‖{:<39}‖{:<42}‖".format(" s. schedule  - weekly schedule",      " o. notes     - description note(no) "))
         print(colors.space*7+colors.plus+colors.line*19+" "+colors.line*21+colors.plus)
         print(colors.space*7+"‖{:<39}‖{:<42}‖".format(" c. calendar  - calendar program      ", " x. exercises - exercise planner"))
         print(colors.space*7+"‖{:<39}‖{:<42}‖".format(" j. date      - change cycle date", " y. streaks   - streak tracker "))
-        print(colors.space*7+"‖{:<39}‖{:<42}‖".format(" e. task      - show active task", " i. prompts   - gpt prompts "))
+        print(colors.space*7+"‖{:<39}‖{:<42}‖".format(" e. task      - show active task(f)", " i. prompts   - gpt prompts "))
         print(colors.space*7+"‖"+colors.plus*19+"  "+colors.plus*21+"‖")
         print("")
         print(colors.space*7+"{:<50}{:>30}".format(f"{daycalculator.days} days left {daycalculator.tldata()}", f"Today is {daycalculator.weektoday}"))
@@ -66,7 +66,7 @@ def main():
             print(colors.space*7+colors.cline*15)
             print(colors.space*7+colors.folder+"(tr) trackers"+colors.space*7+colors.folder+"(re) reminders")
             print(colors.space*7+colors.folder+"(ex) exercises"+colors.space*6+colors.folder+"(ta) tasks")
-            print(colors.space*7+colors.folder2+"(sc/c) schedule"+colors.space*5+colors.folder2+"(ro) routine")
+            print(colors.space*7+colors.folder2+"(sc/pc) schedule"+colors.space*4+colors.folder2+"(ro) routine")
             print(colors.space*7+colors.folder2+"(sg) goals"+colors.space*10+colors.folder2+"(ss) subgoals")
             print(colors.space*7+colors.folder2+"(sf) streaks"+colors.space*8+colors.plus+"(q)  quit")
         except:
@@ -84,6 +84,9 @@ def main():
             clear_terminal()
             schedule.select_task_from_jobs()
             clear_terminal()
+        elif select == "f":
+            schedule.swap_tasks_in_jobdb()
+            clear_terminal()
         elif select == "o":
             clear_terminal()
             notewriter.main()
@@ -92,11 +95,16 @@ def main():
             gpt.main()
         elif select == "sc":
             clear_terminal()
-            schedule.showschedule()
+            print(f"\n\n{schedule.get_schedule_output()}")
+            input(f"\n{colors.space*3}{colors.YELLOW}press any key to continue...{colors.RESET}")
+            clear_terminal()
+        elif select == "scp":
+            clear_terminal()
+            schedule.plot_schedule()
             clear_terminal()
         elif select == "scc":
             clear_terminal()
-            schedule.showschedule_by_time()
+            schedule.schedleft()
             clear_terminal()
         elif select == "sg":
             clear_terminal()

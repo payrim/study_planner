@@ -30,8 +30,8 @@ def show_endeavors():
     tags = set(endeavor['tag'] for endeavor in data)
     print("\n\n")
     for tag in sorted(tags):
-        print(f"{colors.YELLOW}#{tag}{colors.RESET}")  # Print the tag in colors.GREEN
-        endeavors = sorted(filter(lambda e: e['tag'] == tag, data), key=lambda e: e['priority'], reverse=True)  # Sort by priority (highest to lowest)
+        print(f"{colors.YELLOW}#{tag}{colors.RESET}") 
+        endeavors = sorted(filter(lambda e: e['tag'] == tag, data), key=lambda e: e['priority'], reverse=True)  
 
         total_priority = sum(endeavor['priority'] for endeavor in endeavors)
         total_ticks = sum(endeavor['done'] * endeavor['priority'] for endeavor in endeavors)
@@ -41,13 +41,19 @@ def show_endeavors():
 
         for i, endeavor in enumerate(endeavors):
             done = '[x]' if endeavor['done'] else '[ ]'
-            print(f" {str(endeavor['index']).rjust(2)}) {done.ljust(3)} {colors.YELLOW}{endeavor['name']}{colors.RESET}")  # Print endeavor names in colors.BLUE
+            if done == '[x]':
+                name_with_desc = f"{colors.WPURPLE}{endeavor['name']}"
+            else: name_with_desc = f"{colors.YELLOW}{endeavor['name']}"
+            if 'desc' in endeavor: 
+                name_with_desc = f"{name_with_desc}{colors.YELLOW} - {endeavor['desc']}{colors.RESET}" 
+            print(f" {str(endeavor['index']).rjust(2)}) {done.ljust(3)} {name_with_desc}")  
 
-        progress_bar = f"{colors.YELLOW}[{progress_bar_fill * progress_bar_fill_count}{' ' * (progress_bar_length - progress_bar_fill_count)}]{colors.RESET}"  # Print the progress bar in colors.YELLOW
-        print(f"{colors.CYAN}Progress: {progress_bar} {int((total_ticks / total_priority) * 100)}%{colors.RESET}\n\n")  # Print progress information in colors.CYAN
+        progress_bar = f"{colors.YELLOW}[{progress_bar_fill * progress_bar_fill_count}{' ' * (progress_bar_length - progress_bar_fill_count)}]{colors.RESET}" 
+        print(f"{colors.CYAN}Progress: {progress_bar} {int((total_ticks / total_priority) * 100)}%{colors.RESET}\n\n")  
 
     input(f"{colors.YELLOW}Press any key to continue...{colors.RESET}")
     clear_terminal()
+
 
 def showsmall():
     clear_terminal()
@@ -56,13 +62,13 @@ def showsmall():
     tags = set(endeavor['tag'] for endeavor in data)
 
     for tag in sorted(tags):
-        print(f"{colors.BLUE}#{tag}{colors.RESET}")  # Print the tag in colors.GREEN
-        endeavors = sorted(filter(lambda e: e['tag'] == tag, data), key=lambda e: e['priority'], reverse=True)  # Sort by priority (highest to lowest)
+        print(f"{colors.BLUE}#{tag}{colors.RESET}")  
+        endeavors = sorted(filter(lambda e: e['tag'] == tag, data), key=lambda e: e['priority'], reverse=True)  
 
         for i, endeavor in enumerate(endeavors):
             done = '[ ]'
             if endeavor['done'] == False:
-                print(f"({endeavor['index']}) {done} {colors.YELLOW}{endeavor['name']}{colors.RESET}")  # Print endeavor names in colors.BLUE
+                print(f"({endeavor['index']}) {done} {colors.YELLOW}{endeavor['name']}{colors.RESET}")  
 
 
 def add_endeavor():
@@ -74,7 +80,7 @@ def add_endeavor():
     index = len(data)
     data.append({'index': index, 'name': name, 'tag': tag, 'priority':importance, 'done': False})
     save_data(data)
-    print(f"{colors.GREEN}Endeavor added successfully.{colors.RESET}")  # Print success message in colors.GREEN
+    print(f"{colors.GREEN}Endeavor added successfully.{colors.RESET}")  
     clear_terminal()
 
 def remove_endeavor():
@@ -87,7 +93,7 @@ def remove_endeavor():
         endeavor['index'] = i
     save_data(data)
     clear_terminal()
-    print(f"{colors.GREEN}Endeavor removed successfully.{colors.RESET}\n")  # Print success message in colors.GREEN
+    print(f"{colors.GREEN}Endeavor removed successfully.{colors.RESET}\n")  
 
 def toggle_done():
     clear_terminal()
@@ -99,10 +105,10 @@ def toggle_done():
             endeavor['done'] = not endeavor['done']
             save_data(data)
             clear_terminal()
-            print(f"{colors.GREEN}Endeavor toggled successfully.{colors.RESET}\n")  # Print success message in colors.GREEN
+            print(f"{colors.GREEN}Endeavor toggled successfully.{colors.RESET}\n") 
             return
     clear_terminal()
-    print(f"{colors.RED}Endeavor not found.{colors.RESET}\n")  # Print error message in red
+    print(f"{colors.RED}Endeavor not found.{colors.RESET}\n")
 
 
 def check_date():
@@ -130,7 +136,7 @@ def save_today_date():
 def show_by_priority():
     clear_terminal()
     data = load_data()
-    priorities = set(endeavor['priority'] for endeavor in data)  # Get unique priorities from the data
+    priorities = set(endeavor['priority'] for endeavor in data)  
 
     if not priorities:
         print("\nNo endeavors available.")

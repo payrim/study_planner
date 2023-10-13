@@ -897,7 +897,7 @@ def load_tasks_from_file(file_path):
                     duration = int(parts[2])
                     tasks_from_file.append((task_name, duration))
     except FileNotFoundError:
-        print("Tracker main file not found.")
+        pass
     return tasks_from_file
 
 def show_available_tasks(tasks_list):
