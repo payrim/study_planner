@@ -6,18 +6,30 @@ import os
 
 tasks = []
 
-def taskfile():
+def taskfile(show):
     global task_JSON
-    take = int(input(f"\n{colors.YELLOW}|| list of task files ||\n\n{colors.GREEN}1. personal daily tasks\n2. professional tasks\n3. personal work\n\n{colors.RESET}press a number: "))
-    if take == 1:
-        task_JSON = os.path.join(colors.notes_file, "personal_tasks.json")
-    elif take == 2:
-        task_JSON = os.path.join(colors.notes_file, "professional_tasks.json")
-    elif take == 3:
-        task_JSON = os.path.join(colors.notes_file, "personalwork_tasks.json")
+    print(f"\n{colors.YELLOW}|| list of task files ||\n\n{colors.GREEN}1. personal daily tasks\n2. professional tasks\n3. personal work\n\n{colors.RESET}press a number: ")
+    if show == True:
+        take = int(input())
+        if take == 1:
+            task_JSON = os.path.join(colors.notes_file, "personal_tasks.json")
+        elif take == 2:
+            task_JSON = os.path.join(colors.notes_file, "professional_tasks.json")
+        elif take == 3:
+            task_JSON = os.path.join(colors.notes_file, "personalwork_tasks.json")
+        else:
+            print("invalid, taking professional as default")
+            task_JSON = os.path.join(colors.notes_file, "professional_tasks.json")
     else:
-        print("invalid, taking professional as default")
+        clear_terminal()
+        task_JSON = os.path.join(colors.notes_file, "personal_tasks.json")
+        show_tasks()
         task_JSON = os.path.join(colors.notes_file, "professional_tasks.json")
+        show_tasks()
+        task_JSON = os.path.join(colors.notes_file, "personalwork_tasks.json")
+        show_tasks()
+        input("\n\nPress any key to continue...")
+        clear_terminal()
     load_data()
 
 def edit_notes():
@@ -193,8 +205,7 @@ def show_tasks():
         clear_terminal()
         print("No tasks added yet.\n\n")
     else:
-        clear_terminal()
-        print("\n\n")
+        print("\n")
         print("{:<40} {:<29} {:<15}".format(
             f"{colors.space*3}{colors.BLUE}  Name{colors.RESET}",
             f"{colors.BLUE}Status{colors.RESET}",
@@ -280,9 +291,7 @@ def show_tasks():
             print("{:<45}".format(
                 colors.space * 3 + colors.YELLOW + " " + task["name"] + colors.RESET
             ))
-    
-    input("\n\nPress any key to continue...")
-    clear_terminal()
+
 
 
 def flush_tasks():
@@ -385,9 +394,10 @@ def remove_completed_studies():
 
 
 def main():
-    taskfile()
+    taskfile(show=True)
     update_task_indexes()
     save_data()
+    clear_terminal()
     while True:
         print(f"\n\n{colors.YELLOW}||Kanban Board||\n")
         print(f"{colors.CYAN}a.{colors.RESET} {colors.YELLOW}Add task{colors.RESET}")
@@ -427,6 +437,7 @@ def main():
         elif choice == "s":
             clear_terminal()
             show_tasks()
+            input("\n press any key to continue...")
             clear_terminal()
         elif choice == "n":
             clear_terminal()
@@ -465,7 +476,7 @@ def main():
             clear_terminal()
         elif choice == "t":
             clear_terminal()
-            taskfile()
+            taskfile(show=True)
             clear_terminal()
         elif choice == "q":
             clear_terminal()

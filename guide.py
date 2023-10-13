@@ -203,9 +203,7 @@ def main():
                 clear_terminal()
         elif select == "ta":
             clear_terminal()
-            tasks.taskfile()
-            tasks.show_tasks()
-            clear_terminal()
+            tasks.taskfile(show=False)
         elif select == "cc":
             choices = input(colors.space*7+"Are you sure(y/n)? ")
             if choices.lower() == 'y':
