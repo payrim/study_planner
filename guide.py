@@ -5,13 +5,14 @@ from utils import colors, foldermaker
 from utils.clearterminal import clear_terminal
 from estimations import estimation, freeplanner, xestimation, bookplanner
 from modules import (activity, calendar, daycalculator, endeavor, exercise,
-                     flashcard, goals, newbook, notes, project, tasks, active,
+                     flashcard, goals, newbook, notes, project, tasks,
                      repetition, subjects, weighttracker , videolecture,
-                     Streaktracker, schedule, notewriter, focus, gpt)
+                     Streaktracker, schedule, notewriter, gpt)
 
 start_file = os.path.join(colors.notes_file, 'start.json')
 
 def main():
+    activity.check_work_finished()
     start_time = None
     if os.path.exists(start_file):
         with open(start_file, "r") as file:
@@ -40,7 +41,7 @@ def main():
         print(colors.space*7+colors.plus+colors.line*19+" "+colors.line*21+colors.plus)
         print(colors.space*7+"‖{:<39}‖{:<42}‖".format(" c. calendar  - calendar program      ", " x. exercises - exercise planner"))
         print(colors.space*7+"‖{:<39}‖{:<42}‖".format(" j. date      - change cycle date", " y. streaks   - streak tracker "))
-        print(colors.space*7+"‖{:<39}‖{:<42}‖".format(" f. focus     - focus mode (e)", " i. prompts   - gpt prompts "))
+        print(colors.space*7+"‖{:<39}‖{:<42}‖".format(" e. task      - show active task", " i. prompts   - gpt prompts "))
         print(colors.space*7+"‖"+colors.plus*19+"  "+colors.plus*21+"‖")
         print("")
         print(colors.space*7+"{:<50}{:>30}".format(f"{daycalculator.days} days left {daycalculator.tldata()}", f"Today is {daycalculator.weektoday}"))
@@ -48,17 +49,19 @@ def main():
         #print(f"hours in a week is {daycalculator.sum_values}, estimated work is {daycalculator.todayhours} hour and {round(books.pages_per_today)} pages.")
 
 
-        try:           
-            print()
-            active.view_active_task()
-            focus.show_focus()
-            if start_time:
-                time_elapsed = str(datetime.now() - start_time).split('.')[0]
-                print(f"{colors.space*7}{colors.CYAN}Start Time: {colors.WWITE}{start_time.strftime('%H:%M:%S')}{colors.CYAN} - Elapsed Time: {colors.WWITE}{str(time_elapsed)}{colors.RESET}")
+        try:
+            if activity.work_finished == False:           
+                print()
+                schedule.print_first_entry_from_json()
+                if start_time:
+                    time_elapsed = str(datetime.now() - start_time).split('.')[0]
+                    print(f"{colors.space*7}{colors.CYAN}Start Time: {colors.WWITE}{start_time.strftime('%H:%M:%S')}{colors.CYAN} - Elapsed Time: {colors.WWITE}{str(time_elapsed)}{colors.RESET}")
+                else:
+                    print(f"{colors.space*7}{colors.RED}Start Button{colors.RESET} - {colors.YELLOW}Press [sa] {colors.RESET}{colors.YELLOW}to start the button.{colors.RESET}")
+                #activity.calculate_activity_rating()
+                activity.check_work_finished()
             else:
-                print(f"{colors.space*7}{colors.RED}Start Button{colors.RESET} - {colors.YELLOW}Press [sa] {colors.RESET}{colors.YELLOW}to start the button.{colors.RESET}")
-            activity.calculate_activity_rating()
-            #activity.check_work_finished()
+                activity.check_work_finished()
 
             print(colors.space*7+colors.cline*15)
             print(colors.space*7+colors.folder+"(tr) trackers"+colors.space*7+colors.folder+"(re) reminders")
@@ -79,13 +82,11 @@ def main():
             tasks.main()
         elif select == "e":
             clear_terminal()
-            active.set_active_task()
+            schedule.select_task_from_jobs()
+            clear_terminal()
         elif select == "o":
             clear_terminal()
             notewriter.main()
-        elif select == "f":
-            clear_terminal()
-            focus.main()
         elif select == "i":
             clear_terminal()
             gpt.main()
@@ -194,6 +195,7 @@ def main():
                 clear_terminal()
         elif select == "ta":
             clear_terminal()
+            tasks.taskfile()
             tasks.show_tasks()
             clear_terminal()
         elif select == "cc":

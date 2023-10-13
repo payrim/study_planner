@@ -9,7 +9,6 @@ from utils import colors
 
 # Initialize colorama
 init(autoreset=True)
-
 # Constants for rating colors
 COLORS = {
     'red: Terrible': Fore.RED,
@@ -232,7 +231,6 @@ def calculate_activity_rating():
         print(f"{colors.space*7}{colors.RED}The ENDV_FILE file was not found.{colors.RESET}")
     except json.JSONDecodeError:
         print("Error reading JSON data from ENDV_FILE. Please check the file format.")
-    check_work_finished()
 
 
 def calculate_and_save_activity_rating():
@@ -285,6 +283,7 @@ def calculate_and_save_activity_rating():
         print("Error reading JSON data from ENDV_FILE. Please check the file format.")
 
 def check_work_finished():
+    global work_finished
     # Load existing activity data or initialize an empty dictionary
     activity_data = {}
     if os.path.exists(DB_FILE):
@@ -296,7 +295,11 @@ def check_work_finished():
 
     # Check if today's activity rating is set
     if today_date in activity_data:
-        print(f"{colors.YELLOW}{colors.space*7}Work finished, congrats!.{colors.RESET}")
+        work_finished = True
+        print(f"{colors.YELLOW}{colors.space*7}Work finished, congrats!{colors.RESET}")
+    else:
+        work_finished = False
+        calculate_activity_rating()
 
 def check_and_update_yesterday_activity():
     today = datetime.date.today()
@@ -421,7 +424,7 @@ def main():
         print(f"{colors.space*7}{colors.CYAN}o.{colors.RESET} {colors.YELLOW}Load Data from JSON{colors.RESET}")
         print(f"{colors.space*7}{colors.CYAN}q.{colors.RESET} {colors.YELLOW}Quit{colors.RESET}")
         print()
-        check_work_finished()
+        #check_work_finished()
         choice = input("\n"+colors.space*7+"Enter your choice: ").strip()
 
         if choice == 's':

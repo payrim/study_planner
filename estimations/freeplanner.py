@@ -689,7 +689,7 @@ def add_task_from_file():
     tasks_from_file = load_tasks_from_file(pomofile)
     
     if not tasks_from_file:
-        print("No tasks found in the file.")
+        #print("No tasks found in the file.")
         return
     print("\n\nNew Free Tasks found! wanna add them?")
     show_available_tasks(tasks_from_file)

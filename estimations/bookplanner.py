@@ -35,15 +35,11 @@ def load_trackers():
         with open(TRACKER_DB, 'r') as f:
             trackers = json.load(f)
     except FileNotFoundError:
-        # If the file doesn't exist yet, create an empty one
         save_trackers()
 
 
 def save_todays_date():
-    # Get today's date in the format 'dd-mm-yyyy'
     today_date = datetime.date.today().strftime("%d-%m-%Y")
-
-    # Save today's date to a JSON file
     with open(TODAY_JSON, 'w') as f:
         json.dump(today_date, f)
 
@@ -52,7 +48,6 @@ def load_todays_date():
         with open(TODAY_JSON, 'r') as f:
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
-        # If the file doesn't exist or there's an issue with JSON decoding, return None
         save_todays_date()
         return None
 
@@ -615,7 +610,6 @@ def flush_tasks():
         clear_terminal()
         print("cancelled.\n")
 
-# Show trackers divided into a time interval t
 def show_trackers_by_length_interval():
     total_amount_read = sum(task["amount"] for task in tasks)
     total_amount_left = 0
@@ -856,16 +850,9 @@ def toggle_tracker_status():
 
         index = int(input("\nEnter index of tracker to activate: "))
         if 0 <= index < len(unactive_trackers):
-            # Get the selected tracker from unactive_trackers
             selected_tracker = unactive_trackers[index]
-
-            # Add the selected tracker back to trackers
             trackers.append(selected_tracker)
-
-            # Remove the selected tracker from unactive_trackers
             unactive_trackers.pop(index)
-
-            # Save unactive_trackers to unactivetrackers.json
             with open(UNACTIVE_DB, 'w') as f:
                 json.dump(unactive_trackers, f, indent=4)
 
@@ -907,7 +894,7 @@ def add_task_from_file():
     tasks_from_file = load_tasks_from_file(pomofile)
     
     if not tasks_from_file:
-        print("No tasks found in the file.")
+        #print("No tasks found in the file.")
         return
     print("\n\nNew Tasks found! wanna add them?")
     show_available_tasks(tasks_from_file)

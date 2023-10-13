@@ -191,7 +191,7 @@ def show_first_unchecked_subgoal(subgoals):
     
     print(f"\n\n\n{colors.YELLOW}{colors.space*7}First unchecked subgoals for each goal:{colors.RESET}\n")
     for goal_name, subgoal_name in unchecked_subgoals.items():
-        print(f"{colors.CYAN}{colors.space*7}🌠- {goal_name}:{colors.RESET}{colors.GREEN} {subgoal_name}{colors.RESET}")
+        print(f"{colors.CYAN}{colors.space*7}🌠- {goal_name}:{colors.RESET}{colors.YELLOW} {subgoal_name}{colors.RESET}")
 
 def modify_subgoal_index(subgoals, goal_name, subgoal_index, new_index):
     if 0 <= subgoal_index < len(subgoals):

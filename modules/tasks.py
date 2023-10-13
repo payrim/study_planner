@@ -8,7 +8,7 @@ tasks = []
 
 def taskfile():
     global task_JSON
-    take = int(input(" 1. personal daily tasks\n 2. professional tasks\n 3. personal work\n\n press the number: "))
+    take = int(input(f"\n{colors.YELLOW}|| list of task files ||\n\n{colors.GREEN}1. personal daily tasks\n2. professional tasks\n3. personal work\n\n{colors.RESET}press a number: "))
     if take == 1:
         task_JSON = os.path.join(colors.notes_file, "personal_tasks.json")
     elif take == 2:

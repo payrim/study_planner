@@ -50,7 +50,7 @@ def show_exercise(exercise_dict, day):
             if m==0:
                 print(color+colors.space*5+exercise+colors.RESET)
             else:
-                print(color+colors.space*5+MUSC+exercise+colors.RESET)
+                print(color+colors.space*5+exercise+colors.RESET)
             m+=1
         print()
     else:
