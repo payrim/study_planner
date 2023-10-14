@@ -47,7 +47,7 @@ def edit_notes():
 
 
 def show_schedule_by_time(print_output):
-    schedule_lines = get_schedule_output().strip().split('\n')
+    schedule_lines = get_schedule_output(lastl=False).strip().split('\n')
     schedule_output = '\n'.join(schedule_lines[1:])
     current_time = datetime.now().strftime('%H:%M')
     current_time = datetime.strptime(current_time, '%H:%M')
@@ -70,7 +70,7 @@ def show_schedule_by_time(print_output):
             return False
 
 
-def get_schedule_output():
+def get_schedule_output(lastl):
     output = []
     free_activities_hours = {}
 
@@ -102,9 +102,10 @@ def get_schedule_output():
 
         elif print_schedule and not line:
             break
-
-    for day, total_hours in free_activities_hours.items():
-        output.append(f"{colors.WPURPLE}{day} - Total Free Hours: {total_hours:.2f} hours{colors.RESET}")
+    
+    if lastl == True:
+        for day, total_hours in free_activities_hours.items():
+            output.append(f"{colors.WPURPLE}{day} - Total Free Hours: {total_hours:.2f} hours{colors.RESET}")
 
     return '\n'.join(output)
 
@@ -154,8 +155,8 @@ def plot_schedule():
     plt.show()
 
  
-def schedleft():
-    schedule_lines = get_schedule_output().strip().split('\n')
+def schedleft(lastl=False):
+    schedule_lines = get_schedule_output(lastl=False).strip().split('\n')
     print("\n\n"+schedule_lines[0])
     schedule_output = '\n'.join(schedule_lines[1:])
     current_time = datetime.now().strftime('%H:%M')
@@ -463,7 +464,7 @@ def main():
         choice = input("\nEnter choice: ")
         if choice == "s":
             clear_terminal()
-            print("\n\n"+get_schedule_output())
+            print("\n\n"+get_schedule_output(lastl=True))
             input(f"\n{colors.space*2}{colors.YELLOW}Press any key to continue...{colors.RESET}")
             clear_terminal()
         elif choice == "n":

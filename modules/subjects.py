@@ -123,23 +123,46 @@ def move_subject():
     update_subject_indexes()
     show_subjects_Pindexes()
     subject_index = int(input("\nEnter subject index to move: "))
+
+    found_subject = None
     for subject in subjects:
         if subject["index"] == subject_index:
-            current_status = subject['status']
-            if current_status == "Haven't studied":
-                subject['status'] = "Studying right now"
-            elif current_status == "Studying right now":
-                subject['status'] = "Study accomplished"
-            else:
-                print(f"{subject['name']} already accomplished.")
-            save_data()
-            clear_terminal()
-            return
+            found_subject = subject
+            break
 
-    print(f"Subject with index {subject_index} not found.")
+    if found_subject:
+        print(f"Selected subject: {found_subject['name']} - Status: {found_subject['status']}")
+        move_direction = input("Move it forward or back? (forward/back): ").lower()
+
+        if move_direction == "forward":
+            if found_subject['status'] == "Haven't studied":
+                found_subject['status'] = "Studying right now"
+                print(f"{found_subject['name']} moved forward to 'Studying right now'.")
+            elif found_subject['status'] == "Studying right now":
+                found_subject['status'] = "Study accomplished"
+                print(f"{found_subject['name']} moved forward to 'Study accomplished'.")
+            else:
+                print(f"{found_subject['name']} already accomplished.")
+        elif move_direction == "back":
+            if found_subject['status'] == "Studying right now":
+                found_subject['status'] = "Haven't studied"
+                print(f"{found_subject['name']} moved back to 'Haven't studied'.")
+            elif found_subject['status'] == "Study accomplished":
+                found_subject['status'] = "Studying right now"
+                print(f"{found_subject['name']} moved back to 'Studying right now'.")
+            else:
+                print(f"{found_subject['name']} hasn't been started yet.")
+        else:
+            print("Invalid choice. Please enter 'forward' or 'back'.")
+
+        save_data()
+    else:
+        print(f"Subject with index {subject_index} not found.")
+
     input("Press any key to continue...")
     clear_terminal()
     show_subjects()
+
 
 def update_subject():
     clear_terminal()

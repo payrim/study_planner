@@ -121,25 +121,49 @@ def remove_task():
 
 def move_task():
     clear_terminal()
+    update_task_indexes()
     show_tasks_Pindexes()
     task_index = int(input("\nEnter task index to move: "))
+
+    found_task = None
     for task in tasks:
         if task["index"] == task_index:
-            current_status = task['status']
-            if current_status == "Haven't studied":
-                task['status'] = "Studying right now"
-            elif current_status == "Studying right now":
-                task['status'] = "Study accomplished"
-            else:
-                print(f"{task['name']} already accomplished.")
-            save_data()
-            clear_terminal()
-            return
+            found_task = task
+            break
 
-    print(f"Subject with index {task_index} not found.")
-    input("Press any key to continue...")
+    if found_task:
+        print(f"Selected task: {found_task['name']} - Status: {found_task['status']}")
+        move_direction = input("Move it forward or back? (forward/back): ").lower()
+
+        if move_direction == "forward":
+            if found_task['status'] == "Haven't studied":
+                found_task['status'] = "Studying right now"
+                print(f"{found_task['name']} moved forward to 'Studying right now'.")
+            elif found_task['status'] == "Studying right now":
+                found_task['status'] = "Study accomplished"
+                print(f"{found_task['name']} moved forward to 'Study accomplished'.")
+            else:
+                print(f"{found_task['name']} already accomplished.")
+        elif move_direction == "back":
+            if found_task['status'] == "Studying right now":
+                found_task['status'] = "Haven't studied"
+                print(f"{found_task['name']} moved back to 'Haven't studied'.")
+            elif found_task['status'] == "Study accomplished":
+                found_task['status'] = "Studying right now"
+                print(f"{found_task['name']} moved back to 'Studying right now'.")
+            else:
+                print(f"{found_task['name']} hasn't been started yet.")
+        else:
+            print("Invalid choice. Please enter 'forward' or 'back'.")
+
+        save_data()
+    else:
+        print(f"task with index {task_index} not found.")
     clear_terminal()
     show_tasks()
+    input("\n\nPress any key to continue...")
+    clear_terminal()
+
 
 def show_tasks_Pindexes():
     update_task_indexes()

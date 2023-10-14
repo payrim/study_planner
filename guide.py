@@ -99,7 +99,7 @@ def main():
             gpt.main()
         elif select == "sc":
             clear_terminal()
-            print(f"\n\n{schedule.get_schedule_output()}")
+            print(f"\n\n{schedule.get_schedule_output(lastl=False)}")
             input(f"\n{colors.space*3}{colors.YELLOW}press any key to continue...{colors.RESET}")
             clear_terminal()
         elif select == "scp":

@@ -12,9 +12,9 @@ init(autoreset=True)
 # Constants for rating colors
 COLORS = {
     'red: Terrible': Fore.RED,
-    'colors.YELLOW: Okay': Fore.YELLOW,
-    'colors.CYAN: Good': Fore.CYAN,
-    'pure colors.GREEN: perfect': Fore.GREEN,
+    'yellow: Okay': Fore.YELLOW,
+    'cyan: Good': Fore.CYAN,
+    'green: perfect': Fore.GREEN,
 }
 
 # Database file path
@@ -253,11 +253,11 @@ def calculate_and_save_activity_rating():
         elif completion_percentage <= 32:
             color_rating = 'red: Terrible'
         elif completion_percentage <= 65:
-            color_rating = 'colors.YELLOW: Okay'
+            color_rating = 'yellow: Okay'
         elif completion_percentage <= 99:
-            color_rating = 'colors.CYAN: Good'
+            color_rating = 'cyan: Good'
         else:
-            color_rating = 'pure colors.GREEN: perfect'
+            color_rating = 'green: perfect'
 
         # Load existing activity data or initialize an empty dictionary
         activity_data = {}
@@ -333,11 +333,11 @@ def check_and_update_yesterday_activity():
                 elif completion_percentage <= 32:
                     color_rating = 'red: Terrible'
                 elif completion_percentage <= 65:
-                    color_rating = 'colors.YELLOW: Okay'
+                    color_rating = 'yellow: Okay'
                 elif completion_percentage <= 99:
-                    color_rating = 'colors.CYAN: Good'
+                    color_rating = 'cyan: Good'
                 else:
-                    color_rating = 'pure colors.GREEN: perfect'
+                    color_rating = 'green: perfect'
             else:
                 color_rating = 'red: Terrible'
         except FileNotFoundError:
@@ -429,6 +429,7 @@ def main():
 
         if choice == 's':
             clear_terminal()
+            load_data()
             show_activity()
             input("\npress enter to continue...")
             clear_terminal()
