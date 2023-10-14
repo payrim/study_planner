@@ -1022,7 +1022,7 @@ def main():
             save_tasks()
         elif choice == "g":
             clear_terminal()
-            tracker_greedy()
+            tracker_greedy(rint=True)
             input("\n\npress any key to continue...")
             clear_terminal()
         elif choice == "gg":

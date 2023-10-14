@@ -217,7 +217,7 @@ def main():
         elif select == "tr":
             clear_terminal()
             try:
-                estimation.tracker_greedy()
+                estimation.tracker_greedy(rint=True)
                 xestimation.tracker_greedy()
                 freeplanner.tracker_greedy()
                 bookplanner.tracker_greedy()

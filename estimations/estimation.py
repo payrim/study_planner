@@ -169,7 +169,7 @@ def print_trackers():
     print(f"\n{colors.BLUE}Progress: {progress_bar} {int(total_trackers_read / total_trackers * 100)}%{colors.RESET}")
     print(f"{colors.YELLOW}[{total_trackers} total]{colors.RESET}")
 
-def tracker_greedy():
+def tracker_greedy(rint):
     if len(trackers) >0:
         sorted_trackers = []
         shared_indices = []
@@ -272,8 +272,8 @@ def tracker_greedy():
             
             # for element, time_left in zip(trackername, time_left_list):
             #     print(f"{element[0]}: {time_left}")
-
-            print(f"\n\n{colors.space*5}{colors.YELLOW}||Trackers in the next {newt[0][1]} days||{colors.RESET}\n")
+            if rint:
+                print(f"\n\n{colors.space*5}{colors.YELLOW}||Trackers in the next {newt[0][1]} days||{colors.RESET}\n")
             m = 1
 
             for element in trackername:
@@ -309,16 +309,22 @@ def tracker_greedy():
                     if tracker_amount == 0:
                         continue
                     else:
-                        print(f"{colors.space*5}➕ {colors.CYAN}{name}:{colors.RESET}{colors.BLUE} {tracker_amount} {tracker_type}{colors.RESET}{colors.GREEN} -- {tracker_desc}{colors.RESET} ({(tracker_amount/newt[0][1]):.2f} per day can do)")
+                        if rint:
+                            print(f"{colors.space*5}➕ {colors.CYAN}{name}:{colors.RESET}{colors.BLUE} {tracker_amount} {tracker_type}{colors.RESET}{colors.GREEN} -- {tracker_desc}{colors.RESET} ({(tracker_amount/newt[0][1]):.2f} per day can do)")
                     m += 1
                 else:
                     break
 
-            print(f"{colors.space*5}{colors.YELLOW}tracker per day: {day_list[0]:.2f}{colors.RESET}")
+            if rint:
+                print(f"{colors.space*5}{colors.YELLOW}tracker per day: {day_list[0]:.2f}{colors.RESET}")
+            export_var = day_list[0]
         else:
-            print("ERROR: Merge conflict type [MAIN]")
+            if rint:
+                print("ERROR: Merge conflict type [MAIN]")
     else:
-        print("no trackers found.")
+        if rint:
+            print("no trackers found.")
+    return export_var
 
 
 def data_greedy():
@@ -1039,7 +1045,7 @@ def main():
             save_tasks()
         elif choice == "g":
             clear_terminal()
-            tracker_greedy()
+            tracker_greedy(rint=True)
             input("\n\npress any key to continue...")
             clear_terminal()
         elif choice == "gg":

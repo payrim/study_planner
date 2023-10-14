@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 from utils.clearterminal import clear_terminal
 from utils import colors
+from estimations import estimation
 import json, random, os, re
 
 current_day = datetime.now().weekday()
@@ -57,7 +58,8 @@ def show_schedule_by_time(print_output):
         start_time = datetime.strptime(start_time, '%H:%M')
         end_time = datetime.strptime(end_time, '%H:%M') 
         if start_time <= current_time <= end_time:
-            activities_found = True 
+            if not activity == "free":
+                activities_found = True
             if print_output == True:
                 print(f"{colors.space*7}{colors.CYAN}got scheduled activity: {colors.WPURPLE}{line}{colors.RESET}") 
             return activities_found
@@ -70,25 +72,42 @@ def show_schedule_by_time(print_output):
 
 def get_schedule_output():
     output = []
+    free_activities_hours = {}
+
     with open(SCH_TXT, 'r') as file:
         lines = file.readlines()
-    
+
     print_schedule = False
     for line in lines:
-        line = line.strip()  
+        line = line.strip()
         if line.startswith('#') and day_names[current_day] in line:
+            current_day_name = day_names[current_day]
             print_schedule = True
             output.append(f"{colors.CYAN}{line}{colors.RESET}")
-        elif print_schedule and line: 
+            free_activities_hours[current_day_name] = 0  
+        elif print_schedule and line:
             if line.endswith('*'):
-                output.append(f"{colors.WPURPLE}{line}{colors.RESET}") 
-            elif line.endswith('#'):
-                output.append(f"{colors.YELLOW}{line}{colors.RESET}")  
+                output.append(f"{colors.WPURPLE}{line}{colors.RESET}")
+            elif line.endswith('^'):
+                output.append(f"{colors.RED}{line}{colors.RESET}")
+            elif line.endswith('$'):
+                output.append(f"{colors.YELLOW}{line}{colors.RESET}")
             else:
-                output.append(f"{colors.BLUE}{line}{colors.RESET}")  
-        elif print_schedule and not line: 
+                output.append(f"{colors.BLUE}{line}{colors.RESET}")
+
+            start_time, end_time, activity = line.split(' - ')
+            activity_hours = (datetime.strptime(end_time, '%H:%M') - datetime.strptime(start_time, '%H:%M')).seconds / 3600
+            if activity.strip() == "free":
+                free_activities_hours[current_day_name] += activity_hours
+
+        elif print_schedule and not line:
             break
+
+    for day, total_hours in free_activities_hours.items():
+        output.append(f"{colors.WPURPLE}{day} - Total Free Hours: {total_hours:.2f} hours{colors.RESET}")
+
     return '\n'.join(output)
+
 
 def parse_schedule(JobDB):
     schedule = {}
@@ -171,7 +190,7 @@ def select_task_from_jobs():
             current_node = current_node[node]
 
     print("\n"+colors.WPURPLE+"Available tasks:")
-    print(json.dumps(graph, indent=4))  # Display the task graph for user reference
+    print(json.dumps(graph, indent=4)) 
     selected_task = input(f"{colors.YELLOW}Enter the new task: {colors.RESET}")
     try:
         with open(JobDB, 'r') as file:
@@ -352,7 +371,6 @@ def view_statistics():
         time_taken = int(task["time_taken"])
         total_time += time_taken
 
-        # Update tracker_time dictionary
         task_name = task["task"]
         if task_name in tracker_time:
             tracker_time[task_name] += time_taken
@@ -394,8 +412,42 @@ def mark_as_done_task(task_name):
         json.dump(endeavors_data, file, indent=4)
 
 
+def calculate_and_print_free_hours():
+    workperday = estimation.tracker_greedy(rint=False)
+    free_activities_hours = {day_name: 0 for day_name in day_names.values()}  # Initialize dictionary for each day with 0 hours
+
+    with open(SCH_TXT, 'r') as file:
+        lines = file.readlines()
+
+    current_day_name = None
+    for line in lines:
+        line = line.strip()
+        if line.startswith('#') and line[2:] in day_names.values():
+            current_day_name = line[2:]
+        elif current_day_name and line:
+            start_time, end_time, activity = line.split(' - ')
+            activity_hours = (datetime.strptime(end_time, '%H:%M') - datetime.strptime(start_time, '%H:%M')).seconds / 3600
+            if activity.strip() == "free":
+                free_activities_hours[current_day_name] += activity_hours
+
+    print(f"\n\n{colors.YELLOW}{colors.space*2}||Total Free Hours for Each Day||")
+    total_sum = 0
+    for day, total_hours in free_activities_hours.items():
+        total_sum += total_hours
+    workamount = workperday*7/total_sum
+    for day, total_hours in free_activities_hours.items():
+        print(f"{colors.space*3}{day} - {total_hours:.2f} hours {colors.GREEN} (and can do work is {workamount*total_hours:.2f}){colors.RESET}")
+
+    print(f"\n{colors.CYAN}{colors.space*2}Total Free Hours for the Week: {total_sum:.2f} hours")
+    print(f"{colors.CYAN}{colors.space*2}work per average and week: {workperday:.2f} and {workperday*7:.2f}")
+    print(f"{colors.CYAN}{colors.space*2}work per hour is: {workamount:.2f}")
+    return total_sum
+
+
 def main():
     while True:
+        print("\n\n")
+        print_first_entry_from_json()
         print(f"\n{colors.YELLOW}||Schedule Program||{colors.RESET}\n")
         print(f"{colors.CYAN}n.{colors.RESET} {colors.YELLOW}change Schedules{colors.RESET}")
         print(f"{colors.CYAN}s.{colors.RESET} {colors.YELLOW}Show Schedules{colors.RESET}")
@@ -428,6 +480,7 @@ def main():
             clear_terminal()
         elif choice == "t": 
             clear_terminal()
+            print("\n\n")
             show_schedule_by_time(print_output=True)
             input(f"\n{colors.space*2}{colors.YELLOW}Press any key to continue...{colors.RESET}")
             clear_terminal()
@@ -441,8 +494,9 @@ def main():
             swap_tasks_in_jobdb()
         elif choice == "f":
             clear_terminal()
-            print("\n\n")
-            print_first_entry_from_json()
+            calculate_and_print_free_hours()
+            input(f"\n{colors.space*2}{colors.YELLOW}Press any key to continue...{colors.RESET}")
+            clear_terminal()
         elif choice == "c":
             clear_terminal()
             show_and_mark_tasks()
