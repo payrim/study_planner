@@ -84,6 +84,10 @@ def main():
             clear_terminal()
             schedule.select_task_from_jobs()
             clear_terminal()
+        elif select == "fd":
+            clear_terminal()
+            schedule.show_and_mark_tasks()
+            clear_terminal()
         elif select == "f":
             schedule.swap_tasks_in_jobdb()
             clear_terminal()

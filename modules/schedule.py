@@ -80,7 +80,12 @@ def get_schedule_output():
             print_schedule = True
             output.append(f"{colors.CYAN}{line}{colors.RESET}")
         elif print_schedule and line: 
-            output.append(f"{colors.BLUE}{line}{colors.RESET}")  
+            if line.endswith('*'):
+                output.append(f"{colors.WPURPLE}{line}{colors.RESET}") 
+            elif line.endswith('#'):
+                output.append(f"{colors.YELLOW}{line}{colors.RESET}")  
+            else:
+                output.append(f"{colors.BLUE}{line}{colors.RESET}")  
         elif print_schedule and not line: 
             break
     return '\n'.join(output)
@@ -219,28 +224,34 @@ def show_and_mark_tasks():
         data = json.load(file)
     
     tasks = data['tasks']
+
+    with open(JOB_TXT, 'r') as file:
+        words = file.readlines()
+
+    words = [word.strip().split(' - ') for word in words]
+
     
     if not tasks:
         print(f"{colors.YELLOW}No tasks saved in JobDB.{colors.RESET}")
         return
     
-    print("Tasks saved in JobDB:")
+    print(f"{colors.CYAN}Tasks saved in JobDB:")
     for idx, task in enumerate(tasks, start=1):
         print(f"{colors.YELLOW}{idx}. {task}{colors.RESET}")
 
     while True:
         try:
-            task_index = int(input(f"\n{colors.YELLOW}Select a task number to mark as done (0 to cancel): {colors.RESET}"))
+            task_index = int(input(f"\n{colors.WWITE}Select a task number to mark as done (0 to cancel): {colors.RESET}"))
             if task_index == 0:
                 clear_terminal()
                 break
             elif 1 <= task_index <= len(tasks):
                 selected_task = tasks[task_index - 1]
-                print(f"You selected task: {selected_task}")
-                mark_as_done = input(f"Have you done this task? (yes/no): ").lower()
+                print(f"{colors.YELLOW}You selected task: {selected_task}")
+                mark_as_done = input(f"{colors.WPURPLE}Have you done this task? (yes/no): {colors.RESET}").lower()
                 if mark_as_done == 'yes':
                     mark_as_done_task(str(selected_task))
-                    time_taken = input(f"How many minutes did it take you to finish the task? ")
+                    time_taken = input(f"{colors.WPURPLE}How many minutes did it take you to finish the task? {colors.RESET}")
                     try:
                         time_taken = int(time_taken)
                     except ValueError:
@@ -253,7 +264,6 @@ def show_and_mark_tasks():
                         "completed_at": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     }
 
-                    # Save completed task to TIMEJC
                     if not os.path.exists(TIMEJC):
                         with open(TIMEJC, 'w') as time_file:
                             json.dump([completed_task], time_file, indent=4)
@@ -264,8 +274,37 @@ def show_and_mark_tasks():
                             time_file.seek(0)
                             json.dump(time_data, time_file, indent=4)
                     
-                    tasks.pop(task_index - 1)  
-                    print(f"Task '{selected_task}' removed from JobDB.")
+                    matching_word = None
+                    for word in words:
+                        if selected_task in word:
+                            matching_word = word
+                            break
+
+                    if matching_word:
+                        if selected_task == matching_word[-1]:
+                            pass
+                        else:
+                            print(f"{colors.WPURPLE}The selected task matches a word in your list: {matching_word}{colors.RESET}")
+                            replace_task = input(f"{colors.WPURPLE}Do you want to replace it with the next word? (yes/no): {colors.RESET}").lower()
+                            if replace_task == 'yes':
+                                replace_index = matching_word.index(selected_task)
+                                next_word_index = (replace_index + 1) % len(matching_word)
+                                selected_task = matching_word[next_word_index]
+                                clear_terminal()
+                                print(f"\n\nTask replaced with: {selected_task}")
+
+                                tasks[task_index - 1] = selected_task
+                                data['tasks'] = tasks
+
+                                with open(JobDB, 'w') as file:
+                                    json.dump(data, file, indent=4)
+                                break
+
+
+
+                    tasks.pop(task_index - 1)
+                    clear_terminal()  
+                    print(f"\n\nTask '{selected_task}' removed from JobDB.")
                 with open(JobDB, 'w') as file:
                     json.dump(data, file)
             else:
