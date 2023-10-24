@@ -245,15 +245,8 @@ def summarize_subjects():
         hibernated.append(subject)
 
     print(f"\n{colors.YELLOW}Haven't Studied ({len(not_studied)} subjects):{colors.RESET}")
-    if len(not_studied) > 10:
-        for subject in not_studied[:5]:
-            print(f"{colors.CYAN}{subject['index']}. {colors.RESET}{colors.BLUE}{subject['name']}{colors.RESET}")
-        print("...")
-        for subject in not_studied[-5:]:
-            print(f"{colors.CYAN}{subject['index']}. {colors.RESET}{colors.BLUE}{subject['name']}{colors.RESET}")
-    else:
-        for subject in not_studied:
-            print(f"{colors.CYAN}{subject['index']}. {colors.RESET}{colors.BLUE}{subject['name']}{colors.RESET}")
+    for subject in not_studied:
+        print(f"{colors.CYAN}{subject['index']}. {colors.RESET}{colors.BLUE}{subject['name']}{colors.RESET}")
 
     print(f"\n{colors.YELLOW}Studying ({len(studying)} subjects):{colors.RESET}")
     for subject in studying:
@@ -266,6 +259,8 @@ def summarize_subjects():
     print(f"\n{colors.YELLOW}Study Accomplished ({len(studied)} subjects):{colors.RESET}")
     for subject in studied:
         print(f"{colors.CYAN}{subject['index']}.{colors.RESET}{colors.BLUE} {subject['name']}{colors.RESET}")
+
+    print(f"{colors.BLUE}total studies are: {len(not_studied+studying+studied+hibernated)} studies")
 
 def update_subject_indexes():
     global subjects

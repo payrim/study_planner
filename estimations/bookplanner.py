@@ -311,7 +311,7 @@ def tracker_greedy():
         else:
             print("ERROR: Merge conflict type [MAIN]")
     else:
-        print("no trackers found.")
+        print("")
 
 
 def data_greedy():
@@ -439,7 +439,7 @@ def data_greedy():
         else:
             print("ERROR: Merge conflict type [MAIN]")
     else:
-        print("no trackers found.")
+        print("")
 
 
 # Add a new tracker to the list
@@ -1022,7 +1022,7 @@ def main():
             save_tasks()
         elif choice == "g":
             clear_terminal()
-            tracker_greedy(rint=True)
+            tracker_greedy()
             input("\n\npress any key to continue...")
             clear_terminal()
         elif choice == "gg":

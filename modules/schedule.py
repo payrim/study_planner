@@ -61,7 +61,15 @@ def show_schedule_by_time(print_output):
             if not activity == "free":
                 activities_found = True
             if print_output == True:
-                print(f"{colors.space*7}{colors.CYAN}got scheduled activity: {colors.WPURPLE}{line}{colors.RESET}") 
+                try:
+                    with open(JobDB, 'r') as file:
+                        data = json.load(file)
+                        tasks = data.get('tasks', [])
+                        if tasks:
+                            first_entry = tasks[0]
+                except:
+                    pass
+                print(f"{colors.space*7}{colors.CYAN}got scheduled activity: {colors.WPURPLE}{line}{colors.PURPLE} /{first_entry}{colors.RESET}") 
             return activities_found
             
     if print_output == True:
@@ -87,13 +95,15 @@ def get_schedule_output(lastl):
             free_activities_hours[current_day_name] = 0  
         elif print_schedule and line:
             if line.endswith('*'):
-                output.append(f"{colors.WPURPLE}{line}{colors.RESET}")
-            elif line.endswith('^'):
-                output.append(f"{colors.RED}{line}{colors.RESET}")
+                output.append(f"{colors.space*2}{colors.WPURPLE}{line}{colors.RESET}")
+            elif line.endswith('course studies'):
+                output.append(f"{colors.space*2}{colors.GREEN}{line}{colors.RESET}")
             elif line.endswith('$'):
-                output.append(f"{colors.YELLOW}{line}{colors.RESET}")
+                output.append(f"{colors.space*2}{colors.GREEN}{line}{colors.RESET}")
+            elif line.endswith('free'):
+                output.append(f"{colors.space*2}{colors.YELLOW}{line}{colors.RESET}")
             else:
-                output.append(f"{colors.BLUE}{line}{colors.RESET}")
+                output.append(f"{colors.space*2}{colors.BLUE}{line}{colors.RESET}")
 
             start_time, end_time, activity = line.split(' - ')
             activity_hours = (datetime.strptime(end_time, '%H:%M') - datetime.strptime(start_time, '%H:%M')).seconds / 3600
@@ -105,7 +115,7 @@ def get_schedule_output(lastl):
     
     if lastl == True:
         for day, total_hours in free_activities_hours.items():
-            output.append(f"{colors.WPURPLE}{day} - Total Free Hours: {total_hours:.2f} hours{colors.RESET}")
+            output.append(f"{colors.space*2}{colors.WPURPLE}{day} - Total Free Hours: {total_hours:.2f} hours{colors.RESET}")
 
     return '\n'.join(output)
 
@@ -157,7 +167,7 @@ def plot_schedule():
  
 def schedleft(lastl=False):
     schedule_lines = get_schedule_output(lastl=False).strip().split('\n')
-    print("\n\n"+schedule_lines[0])
+    print(f"\n\n{colors.space*2}{schedule_lines[0]}")
     schedule_output = '\n'.join(schedule_lines[1:])
     current_time = datetime.now().strftime('%H:%M')
     current_time = datetime.strptime(current_time, '%H:%M')
@@ -168,8 +178,17 @@ def schedleft(lastl=False):
         start_time = datetime.strptime(start_time, '%H:%M')
         end_time = datetime.strptime(end_time, '%H:%M') 
         if current_time <= end_time:
-            print(f"{colors.BLUE}{line}{colors.RESET}") 
             activities_found = True 
+            if line.endswith('*'):
+                print(f"{colors.space*2}{colors.WPURPLE}{line}{colors.RESET}") 
+            elif line.endswith('course studies'):
+                print(f"{colors.space*2}{colors.GREEN}{line}{colors.RESET}")
+            elif line.endswith('$'):
+                print(f"{colors.space*2}{colors.GREEN}{line}{colors.RESET}") 
+            elif line.endswith('free'):
+                print(f"{colors.space*2}{colors.YELLOW}{line}{colors.RESET}") 
+            else:
+                print(f"{colors.space*2}{colors.BLUE}{line}{colors.RESET}") 
 
     if not activities_found:
         print(f"\n\n{colors.space*3}{colors.WWITE}No scheduled activities for today at the current time.{colors.RESET}")
@@ -415,7 +434,8 @@ def mark_as_done_task(task_name):
 
 def calculate_and_print_free_hours():
     workperday = estimation.tracker_greedy(rint=False)
-    free_activities_hours = {day_name: 0 for day_name in day_names.values()}  # Initialize dictionary for each day with 0 hours
+    free_activities_hours = {day_name: 0 for day_name in day_names.values()}  
+    project_activities_hours = {day_name: 0 for day_name in day_names.values()}  
 
     with open(SCH_TXT, 'r') as file:
         lines = file.readlines()
@@ -430,19 +450,126 @@ def calculate_and_print_free_hours():
             activity_hours = (datetime.strptime(end_time, '%H:%M') - datetime.strptime(start_time, '%H:%M')).seconds / 3600
             if activity.strip() == "free":
                 free_activities_hours[current_day_name] += activity_hours
+            elif activity.strip() == "project time":
+                project_activities_hours[current_day_name] += activity_hours
 
     print(f"\n\n{colors.YELLOW}{colors.space*2}||Total Free Hours for Each Day||")
-    total_sum = 0
+    total_sum_free = 0
+    total_sum_project = 0
     for day, total_hours in free_activities_hours.items():
-        total_sum += total_hours
-    workamount = workperday*7/total_sum
+        total_sum_free += total_hours
+    for day, total_hours_project in project_activities_hours.items():
+        total_sum_project += total_hours_project
+    workamount_free = workperday*7/total_sum_free
+    workamount_project = workperday*7/total_sum_project
     for day, total_hours in free_activities_hours.items():
-        print(f"{colors.space*3}{day} - {total_hours:.2f} hours {colors.GREEN} (and can do work is {workamount*total_hours:.2f}){colors.RESET}")
-
-    print(f"\n{colors.CYAN}{colors.space*2}Total Free Hours for the Week: {total_sum:.2f} hours")
+        total_hours_project = project_activities_hours.get(day, 0)
+        print(f"{colors.space*3}{day} - {total_hours:.2f} hours {colors.GREEN}(and can do work is {workamount_free*total_hours:.2f}){colors.WPURPLE} (P:{total_hours_project:.2f}) {colors.RESET}")
+        
+    print(f"\n{colors.CYAN}{colors.space*2}Total Free Hours for the Week: {total_sum_free:.2f} hours")
+    print(f"{colors.WPURPLE}{colors.space*2}Total Project Hours for the Week: {total_sum_project:.2f} hours")
     print(f"{colors.CYAN}{colors.space*2}work per average and week: {workperday:.2f} and {workperday*7:.2f}")
-    print(f"{colors.CYAN}{colors.space*2}work per hour is: {workamount:.2f}")
-    return total_sum
+    print(f"{colors.CYAN}{colors.space*2}work per hour is: {workamount_free:.2f}")
+    return total_sum_free
+
+
+def sum_and_print_activities():
+    activity_sums = {
+        "Free": 0,
+        "Project Time": 0,
+        "Classes": 0,
+        "course studies": 0,
+        "Assigned tasks": {},
+        "Other stuff": 0,
+        "Sleep": 42
+    }
+
+    with open(SCH_TXT, 'r') as file:
+        lines = file.readlines()
+
+    for line in lines:
+        line = line.strip()
+        if line.endswith('$'):
+            start_time, end_time, task = line.split(' - ')
+            activity_hours = (datetime.strptime(end_time, '%H:%M') - datetime.strptime(start_time, '%H:%M')).seconds / 3600
+            if task in activity_sums["Assigned tasks"]:
+                activity_sums["Assigned tasks"][task] += activity_hours
+            else:
+                activity_sums["Assigned tasks"][task] = activity_hours
+        elif line.endswith('*'):
+            start_time, end_time, _ = line.split(' - ')
+            activity_hours = (datetime.strptime(end_time, '%H:%M') - datetime.strptime(start_time, '%H:%M')).seconds / 3600
+            activity_sums["Classes"] += activity_hours
+        elif "course studies" in line.lower():
+            start_time, end_time, _ = line.split(' - ')
+            activity_hours = (datetime.strptime(end_time, '%H:%M') - datetime.strptime(start_time, '%H:%M')).seconds / 3600
+            activity_sums["course studies"] += activity_hours
+        elif "free" in line.lower():
+            start_time, end_time, _ = line.split(' - ')
+            activity_hours = (datetime.strptime(end_time, '%H:%M') - datetime.strptime(start_time, '%H:%M')).seconds / 3600
+            activity_sums["Free"] += activity_hours
+        elif "project time" in line.lower():
+            start_time, end_time, _ = line.split(' - ')
+            activity_hours = (datetime.strptime(end_time, '%H:%M') - datetime.strptime(start_time, '%H:%M')).seconds / 3600
+            activity_sums["Project Time"] += activity_hours
+        else:
+            if len(line.split(' - ')) == 3:
+                start_time, end_time, _ = line.split(' - ')
+                #print(_)
+                activity_hours = (datetime.strptime(end_time, '%H:%M') - datetime.strptime(start_time, '%H:%M')).seconds / 3600
+                activity_sums["Other stuff"] += activity_hours
+
+    print(f"\n{colors.CYAN}{colors.space*2}Activity Sums for the Week:")
+    for activity, total_hours in sorted(activity_sums.items(), key=lambda x: sum(x[1].values()) if isinstance(x[1], dict) else x[1], reverse=True):
+        if activity == "Assigned tasks":
+            total_assigned_hours = sum(total_hours.values())
+            print(f"{colors.space*3}{activity}: {total_assigned_hours:.2f} hours{{")
+            for task, hours in sorted(total_hours.items(), key=lambda x: x[1], reverse=True):
+                print(f"{colors.CYAN}{colors.space*7}{task[:-1]}: {hours:.2f} hours {colors.RESET}")
+            print(f"{colors.space*5}}}")
+        else:
+            print(f"{colors.space*3}{activity}: {total_hours:.2f} hours")
+
+def show_tasks():
+    with open(JobDB, 'r') as file:
+        data = json.load(file)
+    
+    tasks = data['tasks']
+
+    with open(JOB_TXT, 'r') as file:
+        words = file.readlines()
+
+    words = [word.strip().split(' - ') for word in words]
+
+    
+    if not tasks:
+        print(f"{colors.YELLOW}No tasks saved in JobDB.{colors.RESET}")
+        return
+    
+    print(f"\n\n{colors.space*7}{colors.CYAN}Tasks saved in JobDB")
+    print(f"{colors.space*7}{colors.CYAN}{colors.line2*50}")
+    for idx, task in enumerate(tasks, start=1):
+        print(f"{colors.space*8}{colors.GREEN}{idx}.{colors.YELLOW} {task}{colors.RESET}")
+
+def show_schedule_py():
+    activities_found = None  # Initialize the variable before the loop
+    schedule_lines = get_schedule_output(lastl=False).strip().split('\n')
+    schedule_output = '\n'.join(schedule_lines[1:])
+    current_time = datetime.now().strftime('%H:%M')
+    current_time = datetime.strptime(current_time, '%H:%M')
+    
+    for line in schedule_output.split('\n'):
+        line = remove_color_codes(line.strip())
+        start_time, end_time, activity = line.split(' - ')
+        start_time = datetime.strptime(start_time, '%H:%M')
+        end_time = datetime.strptime(end_time, '%H:%M') 
+        if start_time <= current_time <= end_time:
+            if not activity == "free":
+                activities_found = line
+            print(f"{colors.space*7}{colors.CYAN}got scheduled activity: {colors.WPURPLE}{line}{colors.RESET}") 
+    if activities_found is None:
+        print(f"\n\n{colors.space*3}{colors.WWITE}No scheduled activities for today at the current time.{colors.RESET}")
+    return activities_found
 
 
 def main():
@@ -450,17 +577,18 @@ def main():
         print("\n\n")
         print_first_entry_from_json()
         print(f"\n{colors.YELLOW}||Schedule Program||{colors.RESET}\n")
-        print(f"{colors.CYAN}n.{colors.RESET} {colors.YELLOW}change Schedules{colors.RESET}")
+        print(f"{colors.CYAN}n.{colors.RESET} {colors.YELLOW}Change Schedules{colors.RESET}")
         print(f"{colors.CYAN}s.{colors.RESET} {colors.YELLOW}Show Schedules{colors.RESET}")
         print(f"{colors.CYAN}l.{colors.RESET} {colors.YELLOW}Show Tody's left schedule{colors.RESET}")
         print(f"{colors.CYAN}p.{colors.RESET} {colors.YELLOW}Show Chart{colors.RESET}")
         print(f"{colors.CYAN}t.{colors.RESET} {colors.YELLOW}Show Schedule by Current Time{colors.RESET}")
-        print(f"{colors.CYAN}w.{colors.RESET} {colors.YELLOW}swap places{colors.RESET}")
-        print(f"{colors.CYAN}k.{colors.RESET} {colors.YELLOW}select a task{colors.RESET}")
-        print(f"{colors.CYAN}c.{colors.RESET} {colors.YELLOW}complete a task{colors.RESET}")
-        print(f"{colors.CYAN}d.{colors.RESET} {colors.YELLOW}show statistics{colors.RESET}")
-        print(f"{colors.CYAN}f.{colors.RESET} {colors.YELLOW}print first task{colors.RESET}")
-        print(f"{colors.CYAN}q.{colors.RESET} {colors.YELLOW}quit{colors.RESET}")
+        print(f"{colors.CYAN}w.{colors.RESET} {colors.YELLOW}Swap places{colors.RESET}")
+        print(f"{colors.CYAN}k.{colors.RESET} {colors.YELLOW}Select a task{colors.RESET}")
+        print(f"{colors.CYAN}c.{colors.RESET} {colors.YELLOW}Complete a task{colors.RESET}")
+        print(f"{colors.CYAN}d.{colors.RESET} {colors.YELLOW}Show statistics{colors.RESET}")
+        print(f"{colors.CYAN}f.{colors.RESET} {colors.YELLOW}Print week's free time and activities.{colors.RESET}")
+        print(f"{colors.CYAN}t.{colors.RESET} {colors.YELLOW}Print week's time{colors.RESET}")
+        print(f"{colors.CYAN}q.{colors.RESET} {colors.YELLOW}Quit{colors.RESET}")
         choice = input("\nEnter choice: ")
         if choice == "s":
             clear_terminal()
@@ -483,6 +611,12 @@ def main():
             clear_terminal()
             print("\n\n")
             show_schedule_by_time(print_output=True)
+            input(f"\n{colors.space*2}{colors.YELLOW}Press any key to continue...{colors.RESET}")
+            clear_terminal()
+        elif choice == "g": 
+            clear_terminal()
+            print("\n\n")
+            sum_and_print_activities()
             input(f"\n{colors.space*2}{colors.YELLOW}Press any key to continue...{colors.RESET}")
             clear_terminal()
         elif choice == "p":

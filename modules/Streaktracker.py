@@ -30,15 +30,15 @@ def show_streaks():
         print("\n\nNo streaks to display.")
     else:
         current_date = datetime.now().date()
-        print(f"\n\n{colors.CYAN}Streaks\n{colors.line2*50}{colors.RESET}")
+        print(f"\n\n{colors.space*7}{colors.CYAN}Daily Challenges\n{colors.space*7}{colors.line2*50}{colors.RESET}")
         for i, streak in enumerate(streaks, start=1):
             if streak['count'] == streak['target']:
-                print(f" {colors.GREEN} {i}. {colors.YELLOW}{streak['name']} {colors.GREEN}({streak['count']}/{streak['target']}){colors.BLUE} reset in {streak['reset_in']} days {colors.RESET}")
+                print(f"{colors.space*7} {colors.GREEN} {i}. {colors.YELLOW}{streak['name']} {colors.GREEN}({streak['count']}/{streak['target']}){colors.BLUE} reset in {streak['reset_in']} days {colors.RESET}")
             else:
                 last_checked_date = datetime.strptime(streak['last_checked'], "%Y-%m-%d").date()
                 reset_duration = timedelta(days=streak['reset_in'])
                 days_left = (last_checked_date + reset_duration - current_date).days
-                print(f" {colors.GREEN} {i}. {colors.YELLOW}{streak['name']} ({colors.BLUE}{streak['count']}{colors.YELLOW}/{streak['target']}){colors.BLUE} reset in {streak['reset_in']} days{colors.RED} ({days_left} left){colors.RESET}")
+                print(f"{colors.space*7} {colors.GREEN} {i}. {colors.YELLOW}{streak['name']} ({colors.BLUE}{streak['count']}{colors.YELLOW}/{streak['target']}){colors.BLUE} reset in {streak['reset_in']} days{colors.RED} ({days_left} left){colors.RESET}")
 
 # Function to add a new streak
 def add_streak():

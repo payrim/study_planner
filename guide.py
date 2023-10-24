@@ -7,7 +7,7 @@ from estimations import estimation, freeplanner, xestimation, bookplanner
 from modules import (activity, calendar, daycalculator, endeavor, exercise,
                      flashcard, goals, newbook, notes, project, tasks,
                      repetition, subjects, weighttracker , videolecture,
-                     Streaktracker, schedule, notewriter, gpt)
+                     Streaktracker, schedule, notewriter, gpt, tgbot)
 
 start_file = os.path.join(colors.notes_file, 'start.json')
 
@@ -66,20 +66,68 @@ def main():
             print(colors.space*7+colors.cline*15)
             print(colors.space*7+colors.folder+"(tr) trackers"+colors.space*7+colors.folder+"(re) reminders")
             print(colors.space*7+colors.folder+"(ex) exercises"+colors.space*6+colors.folder+"(ta) tasks")
-            print(colors.space*7+colors.folder2+"(sc/pc) schedule"+colors.space*4+colors.folder2+"(ro) routine")
+            print(colors.space*7+colors.folder2+"(sc/fpc) schedule"+colors.space*3+colors.folder2+"(ro) routine")
             print(colors.space*7+colors.folder2+"(sg) goals"+colors.space*10+colors.folder2+"(ss) subgoals")
             print(colors.space*7+colors.folder2+"(sf) streaks"+colors.space*8+colors.plus+"(q)  quit")
         except:
             print("\n\nERROR: PROCESS UNIDENTIFIED")
         print(f"\n{colors.space*7}time left till end of the day: {daycalculator.hours} hours, {daycalculator.minutes} minutes.")
-        select = input(colors.space*7+"what you wanna do(cc to clock out)?:   ")
+        select = input(colors.space*7+"what you wanna do(cc to clock out/show)?:   ")
 
-        if select == "d":
+        if select == "show":
+            clear_terminal()
+            print("-"*98)
+            schedule.show_schedule_by_time(print_output=True)
+            schedule.calculate_and_print_free_hours()
+            schedule.schedleft()
+            clear_terminal()
+            try:
+                estimation.tracker_greedy(rint=True)
+                xestimation.tracker_greedy()
+                freeplanner.tracker_greedy()
+                bookplanner.tracker_greedy()
+            except:
+                print("\n\nERROR: PROCESS UNIDENTIFIED")
+            input(f"\n\n{colors.space*3}{colors.YELLOW}press any key to continue...{colors.RESET}")
+            clear_terminal()
+            print("-"*98)
+            current_date = datetime.now().strftime('%d-%m-%Y')
+            calendar.display_calendar(current_date,printtrue=False)
+            clear_terminal()
+            print("-"*98)
+            Streaktracker.show_streaks()
+            schedule.show_tasks()
+            input(f"\n\n{colors.space*3}{colors.YELLOW}press any key to continue...{colors.RESET}")
+            
+            clear_terminal()
+            print("-"*98)
+            endeavor.show_endeavors()
+            clear_terminal()
+            print("-"*98)
+            repetition.show_reminders()
+            input(f"\n\n{colors.space*3}{colors.YELLOW}press any key to continue...{colors.RESET}")
+            clear_terminal()
+            print("-"*98+"\n\n")
+            loaded_goals = goals.load_goals()
+            saved_dates = goals.load_or_create_daygoals()
+            date_differences = goals.calculate_date_difference(saved_dates)
+            goals.remove_days_from_active_goals(loaded_goals, date_differences)
+            goals.print_active_goals(loaded_goals, date_differences)
+            subgoals = goals.load_subgoals()
+            goals.show_first_unchecked_subgoal(subgoals)
+            input(f"\n\n{colors.space*3}{colors.YELLOW}press any key to continue...{colors.RESET}")
+            clear_terminal()
+            tasks.taskfile(show=False)
+            clear_terminal()
+        elif select == "d":
             clear_terminal()
             endeavor.main()
         elif select == "k":
             clear_terminal()
             tasks.main()
+        elif select == "teleg":
+            clear_terminal()
+            tgbot.main()
         elif select == "e":
             clear_terminal()
             schedule.select_task_from_jobs()
@@ -110,6 +158,11 @@ def main():
             clear_terminal()
             schedule.schedleft()
             clear_terminal()
+        elif select == "scf":
+            clear_terminal()
+            schedule.calculate_and_print_free_hours()
+            input(f"\n{colors.space*2}{colors.YELLOW}Press any key to continue...{colors.RESET}")
+            clear_terminal()
         elif select == "sg":
             clear_terminal()
             print("\n\n")
@@ -123,7 +176,7 @@ def main():
         elif select == "sf":
             clear_terminal()
             Streaktracker.show_streaks()
-            input(f"{colors.YELLOW}\n\nPress any key to continue...")
+            input(f"{colors.YELLOW}\n\n{colors.space*5}Press any key to continue...")
             clear_terminal()
         elif select == "ss":
             clear_terminal()

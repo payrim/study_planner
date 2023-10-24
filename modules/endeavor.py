@@ -25,7 +25,6 @@ def save_data(data):
         json.dump(data, f, indent=4)
 
 def show_endeavors():
-    clear_terminal()
     data = load_data()
     tags = set(endeavor['tag'] for endeavor in data)
     print("\n\n")
@@ -178,6 +177,7 @@ def main():
         print_menu()
         choice = input("\nEnter choice: ")
         if choice == 's':
+            clear_terminal()
             show_endeavors()
         elif choice == 'a':
             add_endeavor()

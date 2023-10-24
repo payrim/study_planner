@@ -141,7 +141,6 @@ def add_tracker():
     clear_terminal()
     print("tracker added successfully.")
 
-# Display a list of all the trackers
 def print_trackers():
     total_trackers = sum(tracker['amount'] for tracker in trackers)
     if total_trackers == 0:
@@ -149,7 +148,7 @@ def print_trackers():
         print(f"{colors.RED}No trackers found.{colors.RESET}")
         return
 
-    header = f"{colors.CYAN}Index{colors.RESET}\t{colors.CYAN}Name{colors.RESET}\t\t\t{colors.CYAN}Amount{colors.RESET}\t{colors.CYAN}Done{colors.RESET}\t{colors.CYAN}Type{colors.RESET}\t\t{colors.CYAN}Desc{colors.RESET}\t\t{colors.CYAN}Progress{colors.RESET}\t{colors.CYAN}Days Left{colors.RESET}"
+    header = f"{colors.CYAN}X{colors.RESET}\t{colors.CYAN}Name{colors.RESET}\t\t\t{colors.CYAN}Progress{colors.RESET}\t{colors.CYAN}Type{colors.RESET}\t\t{colors.CYAN}Desc{colors.RESET}\t\t{colors.CYAN}Amount{colors.RESET}\t{colors.CYAN}Done{colors.RESET}\t{colors.CYAN}Days Left{colors.RESET}"
     print(f"\n{header}")
     total_trackers_read = sum(task['amount'] for task in tasks if task['tracker'] in [tracker['name'] for tracker in trackers])
     progress_bar_length = 20
@@ -162,12 +161,13 @@ def print_trackers():
         progress = int(trackers_read * 100 / tracker['amount']) if tracker['amount'] != 0 else 0
 
         # Use string formatting with fixed width for each column
-        print(f"{colors.BLUE}{trackers.index(tracker)}{colors.RESET}\t{colors.YELLOW}{tracker['name']:20}{colors.RESET}\t{colors.GREEN}{tracker['amount']}{colors.RESET}\t{colors.YELLOW}{trackers_read}{colors.RESET}\t{colors.CYAN}{tracker['types']:10}{colors.RESET}\t{tracker['amount_desc']}\t\t{colors.GREEN}{progress}%{colors.RESET}\t\t{colors.YELLOW}{tracker.get('days_left', 'N/A')}{colors.RESET}")
+        print(f"{colors.BLUE}{trackers.index(tracker)}{colors.RESET}\t{colors.YELLOW}{tracker['name']:20}{colors.RESET}\t{colors.GREEN}{progress}%{colors.RESET}\t\t{colors.CYAN}{tracker['types']:10}{colors.RESET}\t{tracker['amount_desc']}\t\t{colors.GREEN}{tracker['amount']}{colors.RESET}\t{colors.YELLOW}{trackers_read}{colors.RESET}\t{colors.YELLOW}{tracker.get('days_left', 'N/A')}{colors.RESET}")
 
     progress_bar_fill_count = int(total_trackers_read / total_trackers * progress_bar_length)
     progress_bar = f"[{progress_bar_fill * progress_bar_fill_count}{' ' * (progress_bar_length - progress_bar_fill_count)}]"
     print(f"\n{colors.BLUE}Progress: {progress_bar} {int(total_trackers_read / total_trackers * 100)}%{colors.RESET}")
     print(f"{colors.YELLOW}[{total_trackers} total]{colors.RESET}")
+
 
 def tracker_greedy(rint):
     if len(trackers) >0:

@@ -230,12 +230,12 @@ def show_tasks():
         print("No tasks added yet.\n\n")
     else:
         print("\n")
-        print("{:<40} {:<29} {:<15}".format(
+        print("{:<49} {:<29} {:<15}".format(
             f"{colors.space*3}{colors.BLUE}  Name{colors.RESET}",
             f"{colors.BLUE}Status{colors.RESET}",
             f"{colors.BLUE}Deadline{colors.RESET}"
         ))
-        print(colors.space * 3 + colors.CYAN + "-" * 70 + colors.RESET)
+        print(colors.space * 3 + colors.CYAN + "-" * 75 + colors.RESET)
         
         count = {"haven't studied": 0, "studying right now": 0, "study accomplished": 0}
         board = {"haven't studied": [], "studying right now": [], "study accomplished": []}
@@ -272,7 +272,7 @@ def show_tasks():
                     days_left = (deadline_datetime - today).days + 1
                     deadline_formatted = f"{days_left} day{'s' if days_left != 1 else ''} left"
                 
-                print("{:<40} {:<20} {:<15}".format(
+                print("{:<49} {:<20} {:<15}".format(
                     colors.space * 3 + colors.YELLOW + " " + task["name"] + colors.RESET,
                     task["status"],
                     deadline_formatted
@@ -280,7 +280,7 @@ def show_tasks():
             
             start = count["haven't studied"] + board_length - count["studying right now"]
             end = len(board["haven't studied"])
-            print(colors.space * 3 + colors.CYAN + "-" * 70 + colors.RESET)
+            print(colors.space * 3 + colors.CYAN + "-" * 75 + colors.RESET)
             
             for task in board["studying right now"]:
                 deadline = task["deadline"]
@@ -304,7 +304,7 @@ def show_tasks():
                     deadline_formatted
                 ))
             
-            print(colors.space * 3 + colors.CYAN + "-" * 70 + colors.RESET)
+            print(colors.space * 3 + colors.CYAN + "-" * 75 + colors.RESET)
         
         accomplished_tasks = sorted(board["study accomplished"], key=lambda x: datetime.strptime(x["deadline"], "%d-%m-%Y"), reverse=True)[:5]
         

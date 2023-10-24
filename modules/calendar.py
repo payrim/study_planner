@@ -4,8 +4,6 @@ from utils.clearterminal import clear_terminal
 from utils import colors
 import os
 
-
-
 CALENDAR_DB = os.path.join(colors.notes_file,  'calendar.json')
 
 # Function to flush the database
@@ -101,7 +99,7 @@ def remove_event():
     print("Event removed successfully!")
 
 # Function to display the calendar
-def display_calendar(start_date):
+def display_calendar(start_date,printtrue):
     clear_terminal()
     calendar_data = load_calendar()
 
@@ -179,23 +177,26 @@ def display_calendar(start_date):
 
 
         print(f"{colors.YELLOW}today's Week of the year: {today_week_number}{colors.RESET}")
-        direction = input("\nEnter direction to change week (l/r) or 'q' to quit: ")
-        if direction == 'q':
-            clear_terminal()
-            break
-        elif direction == 'l':
-            clear_terminal()
-            start_date = switch_weeks(start_date, -4)
-            current_month = datetime.strptime(start_date, '%d-%m-%Y').strftime('%B')  # Update current month
-        elif direction == 'r':
-            clear_terminal()
-            start_date = switch_weeks(start_date, 4)
-            current_month = datetime.strptime(start_date, '%d-%m-%Y').strftime('%B')  # Update current month
+        if printtrue == True:
+            direction = input("\nEnter direction to change week (l/r) or 'q' to quit: ")
+            if direction == 'q':
+                clear_terminal()
+                break
+            elif direction == 'l':
+                clear_terminal()
+                start_date = switch_weeks(start_date, -4)
+                current_month = datetime.strptime(start_date, '%d-%m-%Y').strftime('%B')  # Update current month
+            elif direction == 'r':
+                clear_terminal()
+                start_date = switch_weeks(start_date, 4)
+                current_month = datetime.strptime(start_date, '%d-%m-%Y').strftime('%B')  # Update current month
+            else:
+                clear_terminal()
+                print("Invalid direction.")
+                break
         else:
-            clear_terminal()
-            print("Invalid direction.")
+            input(f"\n\n{colors.space*3}{colors.YELLOW}press any key to continue...{colors.RESET}")
             break
-
 
 
 def switch_weeks(current_date, weeks_offset):
@@ -277,7 +278,7 @@ def main():
         elif choice == 'r':
             remove_event()
         elif choice == 's':
-            display_calendar(current_date)
+            display_calendar(current_date,printtrue=True)
         elif choice == 'f':
             flush_database()
         elif choice == 'c':
