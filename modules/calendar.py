@@ -195,7 +195,6 @@ def display_calendar(start_date,printtrue):
                 print("Invalid direction.")
                 break
         else:
-            input(f"\n\n{colors.space*3}{colors.YELLOW}press any key to continue...{colors.RESET}")
             break
 
 
@@ -279,11 +278,12 @@ def main():
             remove_event()
         elif choice == 's':
             display_calendar(current_date,printtrue=True)
+            input(f"\n\n{colors.space*3}{colors.YELLOW}press any key to continue...{colors.RESET}")
+            clear_terminal()
         elif choice == 'f':
             flush_database()
         elif choice == 'c':
             show_closest_events()
-            clear_terminal()
             clear_terminal()
         elif choice == 'q':
             clear_terminal()

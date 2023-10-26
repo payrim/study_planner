@@ -50,9 +50,6 @@ def show_endeavors():
         progress_bar = f"{colors.YELLOW}[{progress_bar_fill * progress_bar_fill_count}{' ' * (progress_bar_length - progress_bar_fill_count)}]{colors.RESET}" 
         print(f"{colors.CYAN}Progress: {progress_bar} {int((total_ticks / total_priority) * 100)}%{colors.RESET}\n\n")  
 
-    input(f"{colors.YELLOW}Press any key to continue...{colors.RESET}")
-    clear_terminal()
-
 
 def showsmall():
     clear_terminal()
@@ -179,6 +176,8 @@ def main():
         if choice == 's':
             clear_terminal()
             show_endeavors()
+            input(f"{colors.YELLOW}Press any key to continue...{colors.RESET}")
+            clear_terminal()
         elif choice == 'a':
             add_endeavor()
         elif choice == 'r':

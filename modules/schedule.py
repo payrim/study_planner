@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from utils.clearterminal import clear_terminal
 from utils import colors
 from estimations import estimation
-import json, random, os, re
+import json, random, os, re, math
 
 current_day = datetime.now().weekday()
 day_names = {
@@ -22,12 +22,12 @@ JOB_TXT = os.path.join(colors.notes_file, 'jobtodo.txt')
 JobDB = os.path.join(colors.notes_file, 'jobdo.json')
 TIMEJC = os.path.join(colors.notes_file, 'timejc.json')
 EBDB = os.path.join(colors.notes_file, 'endeavors.json')
-
+TMPBOX = os.path.join(colors.notes_file, 'tempbox.json')
+total_hours = 0
 
 def remove_color_codes(text):
     ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
     return ansi_escape.sub('', text)
-
 
 def edit_notes():
     filechoose = int(input(f"\n{colors.YELLOW}||list||\n\n{colors.YELLOW}1.schedule\n{colors.YELLOW}2.job\n\n{colors.WWITE}select the one you want to edit: "))
@@ -79,6 +79,7 @@ def show_schedule_by_time(print_output):
 
 
 def get_schedule_output(lastl):
+    global total_hours
     output = []
     free_activities_hours = {}
 
@@ -116,6 +117,8 @@ def get_schedule_output(lastl):
     if lastl == True:
         for day, total_hours in free_activities_hours.items():
             output.append(f"{colors.space*2}{colors.WPURPLE}{day} - Total Free Hours: {total_hours:.2f} hours{colors.RESET}")
+            workperday = estimation.tracker_greedy(rint=False)
+            output.append(f"\n{colors.space*2}{colors.WPURPLE}📕Amount of work predicted for today: {calculate_work()*total_hours:.2f}📒 \n  #tasks {colors.RESET}")
 
     return '\n'.join(output)
 
@@ -572,6 +575,107 @@ def show_schedule_py():
     return activities_found
 
 
+
+def calculate_work():
+    workperday = estimation.tracker_greedy(rint=False)
+    free_activities_hours = {day_name: 0 for day_name in day_names.values()}  
+    project_activities_hours = {day_name: 0 for day_name in day_names.values()}  
+
+    with open(SCH_TXT, 'r') as file:
+        lines = file.readlines()
+
+    current_day_name = None
+    for line in lines:
+        line = line.strip()
+        if line.startswith('#') and line[2:] in day_names.values():
+            current_day_name = line[2:]
+        elif current_day_name and line:
+            start_time, end_time, activity = line.split(' - ')
+            activity_hours = (datetime.strptime(end_time, '%H:%M') - datetime.strptime(start_time, '%H:%M')).seconds / 3600
+            if activity.strip() == "free":
+                free_activities_hours[current_day_name] += activity_hours
+            elif activity.strip() == "project time":
+                project_activities_hours[current_day_name] += activity_hours
+
+    total_sum_free = 0
+    for day, total_hours in free_activities_hours.items():
+        total_sum_free += total_hours
+    workamount_free = workperday*7/total_sum_free
+   
+    return workamount_free
+
+
+def todaysboxes(addrem):
+    get_schedule_output(lastl=True)
+    global total_hours
+    try:
+        with open(TMPBOX, 'r') as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        data = {'boxes': []}
+    
+    total_boxes = math.ceil(float(total_hours) / 1.25)
+
+    screen_chart = [[' ' for _ in range(50)] for _ in range(total_boxes)]
+    while True:
+        print(f"\n\n{colors.CYAN}Today's Boxes: {total_boxes}")
+        print(f"{colors.YELLOW}{'-' * 50}")
+        
+        for idx in range(total_boxes):
+            if idx < len(data['boxes']):
+                box_text = data['boxes'][idx]
+                print(f"{colors.YELLOW}|{box_text.center(48)}|")
+            else:
+                print(f"{colors.YELLOW}|{' ' * 48}|")
+            print(f"{colors.YELLOW}{'-' * 50}")
+        if addrem==True:
+            action = input(f"\n{colors.WWITE}Do you want to add or remove a box? (a/r/q): {colors.RESET}").lower()
+
+            if action == 'a':
+                if len(data['boxes']) < total_boxes:
+                    text = input(f"{colors.YELLOW}Enter text for the box: {colors.RESET}")
+                    box_index = len(data['boxes'])
+                    data['boxes'].append(text)
+                    row = box_index
+                    col = 2  # Adjust the starting column based on your design
+                    screen_chart[row][col:col + len(text)] = text
+                    clear_terminal()
+                    print(f"{colors.GREEN}Box added successfully.{colors.RESET}")
+                else:
+                    clear_terminal()
+                    print(f"{colors.RED}All boxes are already filled. Cannot add more boxes.{colors.RESET}")
+
+            elif action == 'r':
+                print(f"\n{colors.YELLOW}Boxes:")
+                for idx, box_text in enumerate(data['boxes']):
+                    print(f"{colors.YELLOW}{idx + 1}. {box_text}")
+                try:
+                    remove_index = int(input(f"{colors.YELLOW}Enter the index of the box to remove: {colors.RESET}")) - 1
+                    if 0 <= remove_index < len(data['boxes']):
+                        removed_text = data['boxes'].pop(remove_index)
+                        clear_terminal()
+                        print(f"{colors.GREEN}Box '{removed_text}' removed successfully.{colors.RESET}")
+                        # Update the screen chart when removing a box
+                        screen_chart[remove_index][2:2 + len(removed_text)] = [' '] * len(removed_text)
+                    else:
+                        clear_terminal()
+                        print(f"{colors.RED}Invalid box index.{colors.RESET}")
+                except ValueError:
+                    clear_terminal()
+                    print(f"{colors.RED}Invalid input. Please enter a number.{colors.RESET}")
+
+            elif action == 'q':
+                with open(TMPBOX, 'w') as file:
+                    json.dump(data, file)
+                break
+
+            else:
+                clear_terminal()
+                print(f"{colors.RED}Invalid action. Please enter 'a', 'r', or 'q'.{colors.RESET}")
+        else:
+            break
+
+
 def main():
     while True:
         print("\n\n")
@@ -618,6 +722,10 @@ def main():
             print("\n\n")
             sum_and_print_activities()
             input(f"\n{colors.space*2}{colors.YELLOW}Press any key to continue...{colors.RESET}")
+            clear_terminal()
+        elif choice == "b":
+            clear_terminal()
+            todaysboxes(addrem=True)
             clear_terminal()
         elif choice == "p":
             clear_terminal()

@@ -28,8 +28,6 @@ def taskfile(show):
         show_tasks()
         task_JSON = os.path.join(colors.notes_file, "personalwork_tasks.json")
         show_tasks()
-        input("\n\nPress any key to continue...")
-        clear_terminal()
     load_data()
 
 def edit_notes():
@@ -501,6 +499,7 @@ def main():
         elif choice == "t":
             clear_terminal()
             taskfile(show=True)
+            input("\n\nPress any key to continue...")
             clear_terminal()
         elif choice == "q":
             clear_terminal()

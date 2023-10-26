@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
-import os
-import json
+import os, json, io, sys,re 
 from utils import colors, foldermaker
 from utils.clearterminal import clear_terminal
 from estimations import estimation, freeplanner, xestimation, bookplanner
@@ -11,7 +10,127 @@ from modules import (activity, calendar, daycalculator, endeavor, exercise,
 
 start_file = os.path.join(colors.notes_file, 'start.json')
 
+
+def telegram_status_print():
+    original_stdout = sys.stdout
+    sys.stdout = io.StringIO()
+    estimation.tracker_greedy(rint=True)
+    xestimation.tracker_greedy()
+    freeplanner.tracker_greedy()
+    print("#work🏮🎈")
+    function_output = sys.stdout.getvalue()
+    sys.stdout = original_stdout
+    ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
+    function_output_cleaned = ansi_escape.sub('', function_output)
+    tgbot.pytelbot(function_output_cleaned)
+
+    original_stdout = sys.stdout
+    sys.stdout = io.StringIO()
+    repetition.show_reminders()
+    print("#spaced_repetition #repetition #reminders🕐🕠🕘")
+    function_output = sys.stdout.getvalue()
+    sys.stdout = original_stdout
+    ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
+    function_output_cleaned = ansi_escape.sub('', function_output)
+    tgbot.pytelbot(function_output_cleaned)
+    
+
+    original_stdout = sys.stdout
+    sys.stdout = io.StringIO()
+    today_index = (datetime.today().weekday() + 2) % 7
+    exercise_days = ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    today = exercise_days[today_index]
+    exercise_data = exercise.load_data()
+    print()
+    exercise.show_exercise(exercise_data, today)
+    print("#exercise💪🏻🔥")
+    function_output = sys.stdout.getvalue()
+    sys.stdout = original_stdout
+    ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
+    function_output_cleaned = ansi_escape.sub('', function_output)
+    tgbot.pytelbot(function_output_cleaned)
+
+
+    original_stdout = sys.stdout
+    sys.stdout = io.StringIO()
+    endeavor.show_endeavors()
+    print("#endeavors #routine🌀🧘‍♂️")
+    function_output = sys.stdout.getvalue()
+    sys.stdout = original_stdout
+    ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
+    function_output_cleaned = ansi_escape.sub('', function_output)
+    tgbot.pytelbot(function_output_cleaned)
+
+
+    original_stdout = sys.stdout
+    sys.stdout = io.StringIO()
+    schedule.todaysboxes(addrem=False)
+    print("#boxes📦🐍")
+    function_output = sys.stdout.getvalue()
+    sys.stdout = original_stdout
+    ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
+    function_output_cleaned = ansi_escape.sub('', function_output)
+    tgbot.pytelbot(function_output_cleaned)
+
+
+    original_stdout = sys.stdout
+    sys.stdout = io.StringIO()
+    loaded_goals = goals.load_goals()
+    saved_dates = goals.load_or_create_daygoals()
+    date_differences = goals.calculate_date_difference(saved_dates)
+    goals.remove_days_from_active_goals(loaded_goals, date_differences)
+    goals.print_active_goals(loaded_goals, date_differences)
+    print("\n")
+    subgoals = goals.load_subgoals()
+    goals.show_first_unchecked_subgoal(subgoals)
+    print("\n")
+    Streaktracker.show_streaks()
+    print("#goals #subgoals #streaks🎯⭐️")
+    function_output = sys.stdout.getvalue()
+    sys.stdout = original_stdout
+    ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
+    function_output_cleaned = ansi_escape.sub('', function_output)
+    tgbot.pytelbot(function_output_cleaned)
+
+    original_stdout = sys.stdout
+    sys.stdout = io.StringIO()
+    tasks.taskfile(show=False)
+    print("#tasks #deadline ⚠️⚠️")
+    function_output = sys.stdout.getvalue()
+    sys.stdout = original_stdout
+    ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
+    function_output_cleaned = ansi_escape.sub('', function_output)
+    tgbot.pytelbot(function_output_cleaned)
+    
+
+
+    original_stdout = sys.stdout
+    sys.stdout = io.StringIO()
+    current_date = datetime.now().strftime('%d-%m-%Y')
+    calendar.display_calendar(current_date,printtrue=False)
+    print("#calendar 🗓📅")
+    function_output = sys.stdout.getvalue()
+    sys.stdout = original_stdout
+    ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
+    function_output_cleaned = ansi_escape.sub('', function_output)
+    tgbot.pytelbot(function_output_cleaned)
+    
+
+    original_stdout = sys.stdout
+    sys.stdout = io.StringIO()
+    schedule.show_tasks()
+    print("#tasks #jobdb 📔🎸")
+    function_output = sys.stdout.getvalue()
+    sys.stdout = original_stdout
+    ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
+    function_output_cleaned = ansi_escape.sub('', function_output)
+    tgbot.pytelbot(function_output_cleaned)
+
 def main():
+    try:
+        tgbot.check_and_update_json()
+    except:
+        pass
     activity.check_work_finished()
     start_time = None
     if os.path.exists(start_file):
@@ -72,7 +191,7 @@ def main():
         except:
             print("\n\nERROR: PROCESS UNIDENTIFIED")
         print(f"\n{colors.space*7}time left till end of the day: {daycalculator.hours} hours, {daycalculator.minutes} minutes.")
-        select = input(colors.space*7+"what you wanna do(cc to clock out/show)?:   ")
+        select = input(colors.space*7+"what you wanna do(cc to clock out/show/push)?:   ")
 
         if select == "show":
             clear_terminal()
@@ -93,6 +212,7 @@ def main():
             print("-"*98)
             current_date = datetime.now().strftime('%d-%m-%Y')
             calendar.display_calendar(current_date,printtrue=False)
+            input(f"\n\n{colors.space*3}{colors.YELLOW}press any key to continue...{colors.RESET}")
             clear_terminal()
             print("-"*98)
             Streaktracker.show_streaks()
@@ -102,6 +222,7 @@ def main():
             clear_terminal()
             print("-"*98)
             endeavor.show_endeavors()
+            input(f"{colors.YELLOW}Press any key to continue...{colors.RESET}")
             clear_terminal()
             print("-"*98)
             repetition.show_reminders()
@@ -118,6 +239,10 @@ def main():
             input(f"\n\n{colors.space*3}{colors.YELLOW}press any key to continue...{colors.RESET}")
             clear_terminal()
             tasks.taskfile(show=False)
+            input("\n\nPress any key to continue...")
+            clear_terminal()
+        elif select == "push":
+            telegram_status_print()
             clear_terminal()
         elif select == "d":
             clear_terminal()
@@ -127,7 +252,7 @@ def main():
             tasks.main()
         elif select == "teleg":
             clear_terminal()
-            tgbot.main()
+            tgbot.check_and_update_json()
         elif select == "e":
             clear_terminal()
             schedule.select_task_from_jobs()
@@ -202,9 +327,14 @@ def main():
         elif select == "ro":
             clear_terminal()
             endeavor.show_endeavors()
+            input(f"{colors.YELLOW}Press any key to continue...{colors.RESET}")
             clear_terminal()
         elif select == "sa":
             clear_terminal()
+            tgbot.pytelbot("🔥 Good Day! May you Seize the day with confidence and purpose! 💪✨")
+            todaysch = "\n\n"+"your today's schedule is:\n"+schedule.remove_color_codes(schedule.get_schedule_output(lastl=True))
+            tgbot.pytelbot(todaysch)
+            telegram_status_print()
             start_time = datetime.now()
             start_data = {"start_time": start_time.strftime("%Y-%m-%d %H:%M:%S")}
             with open(start_file, "w") as file:
@@ -261,10 +391,19 @@ def main():
         elif select == "ta":
             clear_terminal()
             tasks.taskfile(show=False)
+            input("\n\nPress any key to continue...")
+            clear_terminal()
         elif select == "cc":
             choices = input(colors.space*7+"Are you sure(y/n)? ")
             if choices.lower() == 'y':
                 activity.calculate_and_save_activity_rating()
+                original_stdout = sys.stdout
+                sys.stdout = io.StringIO()
+                activity.calculate_activity_rating()
+                function_output = sys.stdout.getvalue()
+                sys.stdout = original_stdout
+                tgbot.pytelbot(function_output)
+                tgbot.pytelbot("Congrats! what a day to be alive💫💫")
             else:
                 clear_terminal()
         elif select == "tr":
